@@ -9,7 +9,7 @@ import (
 	"github.com/PuerkitoBio/goquery"
 )
 
-func ExampleScrape(prices chan string, wg *sync.WaitGroup) {
+func scrapePrices(prices chan string, wg *sync.WaitGroup) {
 	// Request the HTML page.
 	res, err := http.Get("https://sopharmacy.bg/bg/product/000000000030011088")
 	if err != nil {
@@ -35,7 +35,7 @@ func main() {
 	var wg sync.WaitGroup
 	prices := make(chan string)
 
-	go ExampleScrape(prices, &wg)
+	go scrapePrices(prices, &wg)
 	res := <-prices
 	fmt.Printf("Price: %s\n", res)
 	wg.Wait()
