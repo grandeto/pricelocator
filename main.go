@@ -1,9 +1,9 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"net/http"
+	"net/smtp"
 	"sync"
 
 	"github.com/PuerkitoBio/goquery"
@@ -27,7 +27,33 @@ func scrapePrices(url string, tag string, prices chan string, wg *sync.WaitGroup
 	if err != nil {
 		log.Fatal(err)
 	}
-	prices <- doc.Find(tag).Text() + " - " + url
+	prices <- doc.Find(tag).Text() + " - " + url + "\r\n\r\n"
+}
+
+func emailNotify(msg []byte) {
+	// Sender data.
+	from := "your.email@gmail.com"
+	password := "password"
+
+	// Receiver email address.
+	to := []string{
+		"your.email@gmail.com",
+	}
+
+	// smtp server configuration.
+	smtpHost := "smtp.gmail.com"
+	smtpPort := "587"
+	
+	// Authentication.
+	auth := smtp.PlainAuth("", from, password, smtpHost)
+	
+	// Sending email.
+	err := smtp.SendMail(smtpHost+":"+smtpPort, auth, from, to, msg)
+	if err != nil {
+		//fmt.Println(err)
+		return
+	}
+	//fmt.Println("Email Sent Successfully!")
 }
 
 func main() {
@@ -53,7 +79,11 @@ func main() {
 	wg.Wait()
 	close(prices)
 
+	msg := "Subject: PriceLocator\r\n\r\n"
+
 	for price := range prices {
-		fmt.Printf("%s\n\n", price)
+		msg += price
 	}
+
+	emailNotify([]byte(msg))
 }
