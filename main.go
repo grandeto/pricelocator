@@ -42,24 +42,26 @@ func emailNotify(msg []byte) {
 
 func scrapePrices(url string, tag string, prices chan string, wg *sync.WaitGroup) {
 	defer wg.Done()
+	
 	errmsg := ""
+
 	// Request the HTML page.
 	res, err := http.Get(url)
 	if err != nil {
 		log.Println(err)
-		errmsg = "http.Get error " + err.Error() + " " + url
+		errmsg = "http.Get error " + err.Error() + " " + url + "\r\n\r\n"
 	}
 	defer res.Body.Close()
 	if res.StatusCode != 200 {
 		log.Printf("status code error: %d %s", res.StatusCode, res.Status)
-		errmsg = res.Status + " " + url
+		errmsg = res.Status + " " + url + "\r\n\r\n"
 	}
 
 	// Load the HTML document
 	doc, err := goquery.NewDocumentFromReader(res.Body)
 	if err != nil {
 		log.Print(err)
-		errmsg = "goquery error " + err.Error() + " " + url
+		errmsg = "goquery error " + err.Error() + " " + url + "\r\n\r\n"
 	}
 	
 	if errmsg != "" {
