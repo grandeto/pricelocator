@@ -2,11 +2,14 @@ package main
 
 import (
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"net/smtp"
 	"os"
+	"strconv"
 	"sync"
+	"time"
 
 	"github.com/PuerkitoBio/goquery"
 )
@@ -67,15 +70,42 @@ func scrapePrices(url string, tag string, prices chan string, wg *sync.WaitGroup
 	prices <- doc.Find(tag).Text() + " - " + url + "\r\n\r\n"
 }
 
+func isExecutedToday() bool {
+	executionLogPath := "pricelocator-latest-run"
+	t := time.Now()
+	currentExecutionTime := strconv.Itoa(t.Year()) + "-" + t.Month().String() + "-" + strconv.Itoa(t.Day()) + "\n"
+	logContent := []byte(currentExecutionTime)
+
+	if _, err := os.Stat(executionLogPath); os.IsNotExist(err) {
+		ioutil.WriteFile(executionLogPath, logContent, 0644)
+		return false
+	}
+
+	lastExecutionTime, _ := ioutil.ReadFile(executionLogPath)
+
+	if (string(lastExecutionTime) == currentExecutionTime) {
+		return true
+	}
+
+	ioutil.WriteFile(executionLogPath, logContent, 0644)
+
+	return false
+}
+
 func main() {
 	urls := map[string]string{
 		"https://sopharmacy.bg/bg/product/000000000030011088": ".price.price--inline.price--l",
-		"https://bemore.shop/bg/2-br-collanol-s-25-otst-pka": ".product-info-price .price",
-		"https://bemore.shop/bg/collanol-10": ".product-info-price .price",
+		"https://bemore.shop/bg-en/2-br-collanol-s-25-otst-pka": ".product-info-price .price",
+		"https://bemore.shop/bg-en/collanol-10": ".product-info-price .price",
 		"https://subra.bg/bg/hranitelni-dobavki/vitaslim-collanol-x-20-caps.html": "#sec_discounted_price_12778",
 		"https://remedium.bg/collanol-intakten-kolagen-i-kurkumin-za-zdravi-kosti-i-stavi-h20-kapsuli-148074/p": ".Price__PriceLabel-sc-14hy5o8-1",
 		"https://befit.bg/collanol-kolagen-i-kurkumin-za-zdravi-stavi-i-kosti-20-kaps": ".price-box .price",
 		"https://www.aptekadetelina.bg/collanol-kolanol-680-mg-20-kapsuli?manufacturer_id=575" : "#ProductPriceSystem_DAuHUM6x .price",
+	}
+
+	if (isExecutedToday()) {
+		fmt.Println("Today execution has been already processed")
+		return
 	}
 
 	var wg sync.WaitGroup
