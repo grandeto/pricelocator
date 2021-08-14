@@ -4,44 +4,24 @@ import (
 	"log"
 	"net/http"
 	"net/smtp"
+	"os"
 	"sync"
 
 	"github.com/PuerkitoBio/goquery"
 )
 
-func scrapePrices(url string, tag string, prices chan string, wg *sync.WaitGroup) {
-	defer wg.Done()
-
-	// Request the HTML page.
-	res, err := http.Get(url)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer res.Body.Close()
-	if res.StatusCode != 200 {
-		log.Fatalf("status code error: %d %s", res.StatusCode, res.Status)
-	}
-
-	// Load the HTML document
-	doc, err := goquery.NewDocumentFromReader(res.Body)
-	if err != nil {
-		log.Fatal(err)
-	}
-	prices <- doc.Find(tag).Text() + " - " + url + "\r\n\r\n"
-}
-
 func emailNotify(msg []byte) {
 	// Sender data.
-	from := "your.email@gmail.com"
-	password := "password"
+	from := os.Getenv("PRICELOCATOR_MAIL_FROM")
+	password := os.Getenv("PRICELOCATOR_MAIL_PASS")
 
 	// Receiver email address.
 	to := []string{
-		"your.email@gmail.com",
+		os.Getenv("PRICELOCATOR_MAIL_TO"),
 	}
 
 	// smtp server configuration.
-	smtpHost := "smtp.gmail.com"
+	smtpHost := os.Getenv("PRICELOCATOR_MAIL_HOST")
 	smtpPort := "587"
 	
 	// Authentication.
@@ -50,10 +30,40 @@ func emailNotify(msg []byte) {
 	// Sending email.
 	err := smtp.SendMail(smtpHost+":"+smtpPort, auth, from, to, msg)
 	if err != nil {
-		//fmt.Println(err)
+		log.Println(err)
 		return
 	}
-	//fmt.Println("Email Sent Successfully!")
+	log.Println("Email Sent Successfully!")
+}
+
+func scrapePrices(url string, tag string, prices chan string, wg *sync.WaitGroup) {
+	defer wg.Done()
+	errmsg := ""
+	// Request the HTML page.
+	res, err := http.Get(url)
+	if err != nil {
+		log.Println(err)
+		errmsg = "http.Get error " + err.Error() + " " + url
+	}
+	defer res.Body.Close()
+	if res.StatusCode != 200 {
+		log.Printf("status code error: %d %s", res.StatusCode, res.Status)
+		errmsg = res.Status + " " + url
+	}
+
+	// Load the HTML document
+	doc, err := goquery.NewDocumentFromReader(res.Body)
+	if err != nil {
+		log.Print(err)
+		errmsg = "goquery error " + err.Error() + " " + url
+	}
+	
+	if errmsg != "" {
+		prices <- errmsg
+		return
+	}
+
+	prices <- doc.Find(tag).Text() + " - " + url + "\r\n\r\n"
 }
 
 func main() {
