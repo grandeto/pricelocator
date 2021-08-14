@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"net/smtp"
@@ -30,10 +31,10 @@ func emailNotify(msg []byte) {
 	// Sending email.
 	err := smtp.SendMail(smtpHost+":"+smtpPort, auth, from, to, msg)
 	if err != nil {
-		log.Println(err)
+		fmt.Println(err)
 		return
 	}
-	log.Println("Email Sent Successfully!")
+	fmt.Println("Email Sent Successfully!")
 }
 
 func scrapePrices(url string, tag string, prices chan string, wg *sync.WaitGroup) {
