@@ -130,8 +130,12 @@ func main() {
 
 	msg := fmt.Sprintf("Subject: PriceLocator Summary - %d urls\r\n\r\n", len(urls))
 
+	counter := 1
+
 	for price := range prices {
-		msg += price
+		pricerow := fmt.Sprintf("%d\r\n %s", counter, price)
+		counter+=1
+		msg += pricerow
 	}
 
 	emailNotify([]byte(msg))
