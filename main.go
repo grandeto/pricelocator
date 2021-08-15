@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"net/smtp"
 	"os"
-	"strconv"
 	"sync"
 	"time"
 
@@ -49,19 +48,20 @@ func scrapePrices(url string, tag string, prices chan string, wg *sync.WaitGroup
 	res, err := http.Get(url)
 	if err != nil {
 		log.Println(err)
-		errmsg = "http.Get error " + err.Error() + " " + url + "\r\n\r\n"
+		errmsg = fmt.Sprintf("http.Get error %s %s\r\n\r\n", err.Error(), url)
 	}
 	defer res.Body.Close()
 	if res.StatusCode != 200 {
-		log.Printf("status code error: %d %s", res.StatusCode, res.Status)
-		errmsg = res.Status + " " + url + "\r\n\r\n"
+		errmsg = fmt.Sprintf("status code error: %d %s", res.StatusCode, res.Status)
+		log.Println(errmsg)
+		errmsg += "\r\n\r\n"
 	}
 
 	// Load the HTML document
 	doc, err := goquery.NewDocumentFromReader(res.Body)
 	if err != nil {
 		log.Print(err)
-		errmsg = "goquery error " + err.Error() + " " + url + "\r\n\r\n"
+		errmsg = fmt.Sprintf("goquery error: %s %s\r\n\r\n", err.Error(), url)
 	}
 	
 	if errmsg != "" {
@@ -69,13 +69,13 @@ func scrapePrices(url string, tag string, prices chan string, wg *sync.WaitGroup
 		return
 	}
 
-	prices <- doc.Find(tag).Text() + " - " + url + "\r\n\r\n"
+	prices <- fmt.Sprintf("%s - %s\r\n\r\n", doc.Find(tag).Text(), url)
 }
 
 func isExecutedToday() bool {
 	executionLogPath := "pricelocator-latest-run"
 	t := time.Now()
-	currentExecutionTime := strconv.Itoa(t.Year()) + "-" + t.Month().String() + "-" + strconv.Itoa(t.Day()) + "\n"
+	currentExecutionTime := fmt.Sprintf("%d-%s-%d\n", t.Year(), t.Month().String(), t.Day())
 	logContent := []byte(currentExecutionTime)
 
 	if _, err := os.Stat(executionLogPath); os.IsNotExist(err) {
@@ -122,7 +122,7 @@ func main() {
 	wg.Wait()
 	close(prices)
 
-	msg := "Subject: PriceLocator\r\n\r\n"
+	msg := fmt.Sprintf("Subject: PriceLocator Summary - %d urls\r\n\r\n", len(urls))
 
 	for price := range prices {
 		msg += price
