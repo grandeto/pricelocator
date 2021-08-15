@@ -32,10 +32,12 @@ func emailNotify(msg []byte) {
 	
 	// Sending email.
 	err := smtp.SendMail(smtpHost+":"+smtpPort, auth, from, to, msg)
+	
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
+
 	fmt.Println("Email Sent Successfully!")
 }
 
@@ -50,7 +52,9 @@ func scrapePrices(url string, tag string, prices chan string, wg *sync.WaitGroup
 		log.Println(err)
 		errmsg = fmt.Sprintf("http.Get error %s %s\r\n\r\n", err.Error(), url)
 	}
+
 	defer res.Body.Close()
+
 	if res.StatusCode != 200 {
 		errmsg = fmt.Sprintf("status code error: %d %s", res.StatusCode, res.Status)
 		log.Println(errmsg)
@@ -59,6 +63,7 @@ func scrapePrices(url string, tag string, prices chan string, wg *sync.WaitGroup
 
 	// Load the HTML document
 	doc, err := goquery.NewDocumentFromReader(res.Body)
+
 	if err != nil {
 		log.Print(err)
 		errmsg = fmt.Sprintf("goquery error: %s %s\r\n\r\n", err.Error(), url)
@@ -106,7 +111,7 @@ func main() {
 	}
 
 	if (isExecutedToday()) {
-		fmt.Println("Today execution has been already processed")
+		fmt.Println("Today execution has already been processed")
 		return
 	}
 
@@ -120,6 +125,7 @@ func main() {
 	}
 
 	wg.Wait()
+
 	close(prices)
 
 	msg := fmt.Sprintf("Subject: PriceLocator Summary - %d urls\r\n\r\n", len(urls))
