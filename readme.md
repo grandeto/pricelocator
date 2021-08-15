@@ -6,14 +6,17 @@ Due to the some websites restrictions like CloudFlare DDoS and/or non-domestic I
 
 # Get Started
 
-- `go build`
-- set the following env variables in `$HOME/.profile`
+- edit urls map in `func main()` according to your needs
+- navigate to `pricelocator` dir and run `go build`
+- set the following env variables (e.g. in `$HOME/.profile`)
 ```
-PRICELOCATOR_MAIL_FROM
-PRICELOCATOR_MAIL_PASS
-PRICELOCATOR_MAIL_TO
-PRICELOCATOR_MAIL_HOST
+export PRICELOCATOR_MAIL_FROM="yourmail@gmail.com"
+export PRICELOCATOR_MAIL_PASS="yourmailpass"
+export PRICELOCATOR_MAIL_TO="yournotificationmail@gmail.com"
+export PRICELOCATOR_MAIL_HOST="smtp.gmail.com"
 ```
-- install cronjob
+- create a cronjob
+
+Linux example:
 
 `0 * * * * . /home/youruser/.profile; cd /home/youruser/path/to/pricelocator/ && /home/youruser/path/to/go run pricelocator >> /home/youruser/pricelocator.log 2>&1`
