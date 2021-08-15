@@ -108,6 +108,15 @@ func main() {
 		"https://remedium.bg/collanol-intakten-kolagen-i-kurkumin-za-zdravi-kosti-i-stavi-h20-kapsuli-148074/p": ".Price__PriceLabel-sc-14hy5o8-1",
 		"https://befit.bg/collanol-kolagen-i-kurkumin-za-zdravi-stavi-i-kosti-20-kaps": ".price-box .price",
 		"https://www.aptekadetelina.bg/collanol-kolanol-680-mg-20-kapsuli?manufacturer_id=575" : "#ProductPriceSystem_DAuHUM6x .price",
+		"https://www.afya-pharmacy.bg/productbg/11026" : ".priceRow .productPrice .currPrice",
+		"https://bglek.com/product/kolanol-kapsuli-680mg-x20-collanol" : "._product-sidebar ._product-details-price-new",
+		"https://aptekamladost.com/product/collanol-kolanol-20-kapsuli/" : ".wd-price-outside .summary-inner .price .woocommerce-Price-amount bdi",
+		"https://366.bg/product/kolanol-680mg-kaps" : ".prices-wrapper .prices",
+		"https://www.pharmacie.bg/productbg/11772" : ".priceRow .productPrice .currPrice",
+		"https://apteka.puls.bg/bg/za-zdravi-kosti-stavi/vitaslim-kolanol-h-20-kaps-67876" : ".product-extra-info .product-prices .price",
+		"https://aptekadara.com/vitamini-i-minerali/42798/vitaslim-kolanol-h-20-kaps" : ".taxed-price-value.price-value",
+		"https://www.adonis.bg/%D0%B2%D0%B8%D1%82%D0%B0%D1%81%D0%BB%D0%B8%D0%BC-%D0%BA%D0%BE%D0%BB%D0%B0%D0%BD%D0%BE%D0%BB-%D0%BA%D0%B0%D0%BF%D1%81%D1%83%D0%BB%D0%B8-680-%D0%BC%D0%B3-%D1%85-20/14806" : ".visible-sm.visible-xs .product-price",
+		"https://www.silabg.com/bg/12655-NOW-UCII-Type-II-Collagen-40-mg--60-Caps-.html" : "#product_price_container .price_1",
 	}
 
 	if (isExecutedToday()) {
