@@ -34,11 +34,11 @@ func emailNotify(msg []byte) {
 	err := smtp.SendMail(smtpHost+":"+smtpPort, auth, from, to, msg)
 	
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		return
 	}
 
-	fmt.Println("Email Sent Successfully!")
+	log.Println("Email Sent Successfully!")
 }
 
 func scrapePrices(url string, tag string, prices chan string, wg *sync.WaitGroup) {
@@ -120,7 +120,7 @@ func main() {
 	}
 
 	if (isExecutedToday()) {
-		fmt.Println("Today execution has already been processed")
+		log.Println("Today execution has already been processed")
 		return
 	}
 
